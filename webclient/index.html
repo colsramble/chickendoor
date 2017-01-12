@@ -1,0 +1,60 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Chicken Door Controller</title>
+  
+  <style type="text/css">
+h1 {
+	text-align: center;
+	font-size: 18px;
+	font-family: Arial, Sans-Serif;
+	color: #4CAF50;
+}
+
+button {
+    margin: auto;
+    width: 80%;
+    border: 3px solid green;
+    padding: 10px;
+    background-color: #4CAF50; /* Green */
+    border: 5px white;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    font-size: 24px;
+} 
+  </style>
+
+  <script src="jquery-3.1.1.min.js"></script>
+  <script>
+  	$(document).ready(function(){
+    	
+    	$("#openbutton").on("click", function(){
+    		$.get("http://192.168.1.7/open", function(data, status){
+        		console.log(data);
+        		console.log(status);
+        	}); 
+    	});
+    	
+    	$("#closebutton").on("click", function(){
+    		$.get("http://192.168.1.7/close", function(data, status){
+        		console.log(data);
+        		console.log(status);
+        	}); 
+    	});
+
+	});
+  </script>
+</head>
+
+<body>
+	<h1>Chicken Door Controller</h1>
+	<button class="pretty" id="openbutton">OPEN</button>
+	<br />
+	<br />
+	<button class="pretty" id="closebutton">CLOSE</button>
+</html>
