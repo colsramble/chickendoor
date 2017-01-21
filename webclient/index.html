@@ -31,22 +31,49 @@ button {
 
   <script src="jquery-3.1.1.min.js"></script>
   <script>
+    chickenDoorURL = "http://chickendoor.local";
+
   	$(document).ready(function(){
     	
     	$("#openbutton").on("click", function(){
-    		$.get("http://192.168.1.7/open", function(data, status){
-        		console.log(data);
-        		console.log(status);
-        	}); 
+        $.ajax({
+          url: chickenDoorURL + "/open",
+          timeout: 10000, // 10 second timeout
+          dataType: "jsonp",
+          error: function(jqXHR, textStatus, errorThrown ) {
+            console.log("Error");
+            alert(errorThrown);
+          },
+          success: function(data, textStatus, jqXHR ) {
+            console.log("success!");
+            console.log(data);
+            alert("Door is " + data.door);
+          }
+        }).done(function() {
+          console.log( "done" );
+        });
+
     	});
     	
     	$("#closebutton").on("click", function(){
-    		$.get("http://192.168.1.7/close", function(data, status){
-        		console.log(data);
-        		console.log(status);
-        	}); 
-    	});
+        $.ajax({
+          url: chickenDoorURL + "/close",
+          timeout: 10000, // 10 second timeout
+          dataType: "jsonp",
+          error: function(jqXHR, textStatus, errorThrown ) {
+            console.log("Error");
+            alert(errorThrown);
+          },
+          success: function(data, textStatus, jqXHR ) {
+            console.log("success!");
+            console.log(data);
+            alert("Door is " + data.door);
+          }
+        }).done(function() {
+          console.log( "done" );
+        });
 
+      });
 	});
   </script>
 </head>

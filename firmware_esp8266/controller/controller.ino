@@ -9,7 +9,7 @@
 // Pin Definitions //
 /////////////////////
 #define PO_ENERGIZE   D2
-#define PO_OPEN       D7
+#define PO_DIRECTION  D7
 #define PI_OPEN       D0
 #define PI_CLOSED     D1
 
@@ -32,13 +32,13 @@ int openDoor() {
   if(isOpen())
     return 0;
 
-  digitalWrite(PO_OPEN, 1);
+  digitalWrite(PO_DIRECTION, 1);
   digitalWrite(PO_ENERGIZE, 1);
   while( !isOpen() && timeout-- ) {
     delay(1);  
   }
   digitalWrite(PO_ENERGIZE, 0);
-  digitalWrite(PO_OPEN, 0);  
+  digitalWrite(PO_DIRECTION, 0);  
 
   return (timeout > 0 ? 0 : 1);
 }
@@ -49,13 +49,13 @@ int closeDoor() {
   if(isClosed())
     return 0;
 
-  digitalWrite(PO_OPEN, 0);
+  digitalWrite(PO_DIRECTION, 0);
   digitalWrite(PO_ENERGIZE, 1);
   while( !isClosed() && timeout-- ) {
     delay(1);  
   }
   digitalWrite(PO_ENERGIZE, 0);
-  digitalWrite(PO_OPEN, 0);  
+  digitalWrite(PO_DIRECTION, 0);  
 
   return (timeout > 0 ? 0 : 1);
 }
@@ -80,12 +80,31 @@ void handleGetLightLevel() {
 }
 
 void handleGetStatus() {
+  String callbackFn = server.hasArg("callback") ? server.arg("callback") : "";
+ 
   DBG_OUTPUT_PORT.println("handleGetStatus");
-  String output = "{ \"lightlevel\": ";
+  String output = "";
+
+  // JSONP function wrapper
+  if (callbackFn.length()) {
+    output += callbackFn;
+    output += "(";
+  }
+
+  // Response body
+  output += "{ \"lightlevel\": ";
   output += getLightLevel();
   output += ", \"door\": ";
-  output += (isOpen() ? "\"open\"" : (isClosed() ? "\"closed\"" : "unknown") ); 
+  output += (isOpen() ? "\"open\"" : (isClosed() ? "\"closed\"" : "\"unknown\"") ); 
   output += " }";
+  
+  // JSONP function wrapper
+  if (callbackFn.length()) {
+    output += ");";
+  }
+
+  output += "\n";
+  
   server.send(200, "text/json", output);
 }
 
@@ -130,8 +149,8 @@ void setupWiFi()
 void initHardware()
 {
   DBG_OUTPUT_PORT.begin(115200);
-  pinMode(PO_OPEN,     OUTPUT);
-  digitalWrite(PO_OPEN, 0);
+  pinMode(PO_DIRECTION,     OUTPUT);
+  digitalWrite(PO_DIRECTION, 0);
   pinMode(PO_ENERGIZE, OUTPUT);
   digitalWrite(PO_ENERGIZE, 0);
 
