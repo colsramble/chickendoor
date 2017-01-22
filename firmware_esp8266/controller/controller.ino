@@ -8,9 +8,9 @@
 /////////////////////
 // Pin Definitions //
 /////////////////////
-#define PO_ENERGIZE   D2
+#define PO_ENERGIZE   D3
 #define PO_DIRECTION  D7
-#define PI_OPEN       D0
+#define PI_OPEN       D2
 #define PI_CLOSED     D1
 
 #define getLightLevel() analogRead(A0)
@@ -154,8 +154,8 @@ void initHardware()
   pinMode(PO_ENERGIZE, OUTPUT);
   digitalWrite(PO_ENERGIZE, 0);
 
-  pinMode(PI_OPEN,     INPUT_PULLUP);
-  pinMode(PI_CLOSED,   INPUT_PULLUP);
+  pinMode(PI_OPEN,     INPUT);
+  pinMode(PI_CLOSED,   INPUT);
 }
 
 void setup()
