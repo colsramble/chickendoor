@@ -27,53 +27,65 @@ button {
     display: block;
     font-size: 24px;
 } 
+
+#statbutton {
+    background-color: white; 
+    color: #4CAF50; /* Green */
+    font-size: 18px;
+}
   </style>
 
   <script src="jquery-3.1.1.min.js"></script>
   <script>
-    chickenDoorURL = "http://chickendoor.local";
+    //chickenDoorURL = "http://chickendoor.local";
+    chickenDoorURL = "http://192.168.1.208";
 
-  	$(document).ready(function(){
-    	
-    	$("#openbutton").on("click", function(){
+    function renderStatus(status) {
+      $("#statbutton img").hide();   
+      $("#statbutton span").html(status);    
+    }
+
+    function renderSpinner() {
+      $("#statbutton span").html("");    
+      $("#statbutton img").show();   
+    }
+
+    function issueRequest(cmd) {
+        renderSpinner();
         $.ajax({
-          url: chickenDoorURL + "/open",
+          url: chickenDoorURL + "/" + cmd,
           timeout: 20000, // 20 second timeout
           dataType: "jsonp",
-          error: function(jqXHR, textStatus, errorThrown ) {
-            console.log("Error");
-            alert(errorThrown);
-          },
           success: function(data, textStatus, jqXHR ) {
-            console.log("success!");
-            console.log(data);
-            alert("Door is " + data.door);
-          }
+            timer = data.tmr / 113333; 
+            min = Math.floor(timer / 60);
+            sec = Math.round(timer - min*60)
+
+            renderStatus("It's <b>" + (data.lightlevel > 20 ? "light" : "dark") + "</b> and the door is <b>" + data.door + "</b><br />auto check in " + min + "min " + sec + "sec");
+          }, 
+          error: function(jqXHR, textStatus, errorThrown ) {
+            renderStatus("Oops - " + textStatus);
+          },
         }).done(function() {
           console.log( "done" );
         });
+    }
 
+    $(document).ready(function(){
+
+      $("#statbutton").on("click", function(){
+        issueRequest('stat');
+      });
+
+    	$("#openbutton").on("click", function(){
+        issueRequest('open');
     	});
     	
     	$("#closebutton").on("click", function(){
-        $.ajax({
-          url: chickenDoorURL + "/close",
-          timeout: 20000, // 20 second timeout
-          dataType: "jsonp",
-          error: function(jqXHR, textStatus, errorThrown ) {
-            console.log("Error");
-            alert(errorThrown);
-          },
-          success: function(data, textStatus, jqXHR ) {
-            console.log("success!");
-            console.log(data);
-            alert("Door is " + data.door);
-          }
-        }).done(function() {
-          console.log( "done" );
-        });
-
+        issueRequest('close');
       });
+
+      issueRequest('stat'); 
 	});
   </script>
 </head>
@@ -84,4 +96,8 @@ button {
 	<br />
 	<br />
 	<button class="pretty" id="closebutton">CLOSE</button>
+  <br />
+  <br />
+  <button class="pretty stat" id="statbutton"><img src="loader.gif" /><span>Status</span></button>
+
 </html>
